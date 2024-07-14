@@ -1,7 +1,20 @@
 //app.jsにサーバーの動作を記述
 const express = require('express'); // express のインポート
+const Pool = require('pg'); // sqlと接続するためのパッケージpgのインポート
+const cors = require('cors') // わからん
+
 const app = express(); // インスタンス化
 const PORT = 5000; // サーバーのポート番号
+app.use(cors()); // エラー消すためのまじない
+
+// pgの設定
+const pool = new Pool({
+    user: 'user',
+    host: 'localhost',
+    database: 'DB',
+    password: 'password',
+    port: 5432,
+  });
 
 // ルートエンドポイントの設定
 // get, post, delete, putなどHTTPリクエストで使うメソッドがある

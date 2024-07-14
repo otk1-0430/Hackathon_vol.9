@@ -3,7 +3,7 @@
 services:
   postgres:
     image: postgres:13
-    container_name: "postgres"
+    container_name: "postgres-hackathon"
     ports:
       - "5432:5432"
     environment:

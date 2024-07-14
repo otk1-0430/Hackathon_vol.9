@@ -8,3 +8,5 @@ npm install
 ```bash
 npm run dev
 ```
+## 止め方
+ctrl + cでおｋ

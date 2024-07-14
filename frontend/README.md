@@ -7,3 +7,5 @@ npm install
 ```bash
 npm start
 ```
+## 止め方
+ctrl + cでおｋ
