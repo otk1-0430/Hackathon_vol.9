@@ -2,11 +2,16 @@
 //app.jsにサーバーの動作を記述
 const express = require('express'); // express のインポート
 const Pool = require('pg'); // sqlと接続するためのパッケージpgのインポート
-const cors = require('cors') // わからん
+const cors = require('cors') // 異なるドメインからのリクエストを許可するために使用
+const bodyParser = require('body-parser'); // body-parserのインポート//HTTPリクエストのボディを解析するために使用
 
 const app = express(); // インスタンス化
 const PORT = 5000; // サーバーのポート番号
 app.use(cors()); // エラー消すためのまじない
+
+//body-parserの設定
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // pgの設定
 const pool = new Pool({
@@ -21,8 +26,22 @@ const pool = new Pool({
 // get, post, delete, putなどHTTPリクエストで使うメソッドがある
 // HTTPリクエストとは https://qiita.com/minateru/items/8693538bbd0768855266
 // localhost:5000/ にアクセスしたときの動作
-app.get('/', (req, res) => {
-    res.send('Hello World!'); // GETリクエストに対するレスポンスとして文章を送信している
+
+
+// ユーザー登録エンドポイント
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const query = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *';
+    const values = [username, password];
+    const result = await pool.query(query, values);
+
+    res.status(201).send(`User registered successfully: ${result.rows[0].id}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error registering user');
+  }
 });
 
 // 他のエンドポイントの設定
@@ -33,5 +52,5 @@ app.get('/about', (req, res) => {
 
 // サーバーの起動
 app.listen(PORT, () => {
-    console.log(`Example app listening at http://localhost:${PORT}`);
+    console.log(`Server is runnig at http://localhost:${PORT}`);
 });
