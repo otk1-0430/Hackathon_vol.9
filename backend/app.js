@@ -34,4 +34,9 @@ app.get('/about', (req, res) => {
 // サーバーの起動
 app.listen(PORT, () => {
     console.log(`Example app listening at http://localhost:${PORT}`);
+<<<<<<< HEAD
 });
+=======
+});
+//ブランチきったよ
+>>>>>>> 578d072d38dec7ea375034b51ec3a5d218c601ca
