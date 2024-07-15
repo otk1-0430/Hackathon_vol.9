@@ -16,3 +16,5 @@ INSERT INTO users (username, password)
     VALUES
         ('testuser1', 'password1'),
         ('testuser2', 'password2');
+
+-- 

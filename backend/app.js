@@ -1,7 +1,7 @@
 
 //app.jsにサーバーの動作を記述
 const express = require('express'); // express のインポート
-const Pool = require('pg'); // sqlと接続するためのパッケージpgのインポート
+const { Pool } = require('pg'); // sqlと接続するためのパッケージpgのインポート
 const cors = require('cors') // 異なるドメインからのリクエストを許可するために使用
 const bodyParser = require('body-parser'); // body-parserのインポート//HTTPリクエストのボディを解析するために使用
 
@@ -29,8 +29,9 @@ const pool = new Pool({
 
 
 // ユーザー登録エンドポイント
-app.post('/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
+  console.log(username, password); // 検証用
 
   try {
     const query = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *';
