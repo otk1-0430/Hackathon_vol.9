@@ -31,6 +31,7 @@ const pool = new Pool({
 // ユーザー登録エンドポイント
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
+  console.log(username, password); // 検証用
 
   try {
     const query = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *';
