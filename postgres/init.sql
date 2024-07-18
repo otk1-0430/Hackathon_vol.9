@@ -50,4 +50,15 @@ INSERT INTO users (username, password)
         ('testuser1', 'password1'),
         ('testuser2', 'password2');
 
--- 他のテーブルにもテストデータを追加する
+-- スポットデータの挿入
+INSERT INTO places (placename, latitude, longitude)
+    VALUES
+        ('north pole', 90.000000, 0.000000),
+        ('south pole', -90.000000, 0.000000);
+
+-- スタンプデータの挿入
+INSERT INTO stamps (user_id, place_id)
+    VALUES
+        (1, 1),
+        (2, 2),
+        (1, 2);
