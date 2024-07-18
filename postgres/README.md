@@ -16,12 +16,35 @@ ctrl + c
 ## ER図
 ![alt text](image.png)
 ### 解説
+#### usersテーブル
+略
+#### placesテーブル
+全スポットの名前、緯度経度を記録
+#### stampsテーブル
+誰がどこに訪れたかを記録
 - PKは主キー(Primary Key)
     - テーブルにおけるレコードを一意に特定する識別子
 - FKは外部キー(Foreign Key)
     - 別テーブルのPK
     - 本テーブルのレコードと別テーブルのレコードを結びつける
         - テーブル結合
+### 初期データ
+#### usersテーブル
+| user_id | user_name | password |
+| ---- | ---- | ---- |
+| 1 | testuser1 | password1 |
+| 2 | testuser2 | password2 |
+#### placesテーブル
+| place_id | placename | latitude | longitude |
+| ---- | ---- | ---- | ---- |
+| 1 | north pole | 90.00000000 | 0.000000 |
+| 2 | south pole | -90.00000000 | 0.000000 |
+#### stampsテーブル
+| stamp_id | user_id | place_id |
+| ---- | ---- | ---- |
+| 1 | 1 | 1 |
+| 2 | 2 | 2 |
+| 3 | 1 | 2 |
 
 ## 各種データ操作のsql文
 - ユーザー認証
