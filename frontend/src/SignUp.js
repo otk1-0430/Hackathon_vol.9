@@ -7,6 +7,7 @@ function SignUp() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
+    //ページの遷移のために絶対にいる
     e.preventDefault();
 
     // フォームデータをバックエンドに送信
@@ -31,7 +32,6 @@ function SignUp() {
         <label>ユーザーネーム</label>
         <input
           type="text"
-          value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
         />
@@ -40,7 +40,6 @@ function SignUp() {
         <label>パスワード</label>
         <input
           type="password"
-          value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
