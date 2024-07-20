@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-function Profile() {
+function MyPage() {
   const location = useLocation();
   const { username } = location.state;
   const [position, setPosition] = useState([51.505, -0.09]); // デフォルト位置
@@ -30,4 +30,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default MyPage;
