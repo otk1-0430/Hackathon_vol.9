@@ -19,7 +19,7 @@ function LogIn() {
     console.log(response.message)
     if(response.ok){
         alert('ログインに成功しました！');
-        navigate('/profile', { state: { username } });
+        navigate('/mypage', { state: { username } });
     }else{
         alert('ログインに失敗しました');
     }
