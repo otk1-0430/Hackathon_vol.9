@@ -1,13 +1,17 @@
-
 //app.jsにサーバーの動作を記述
 const express = require('express'); // express のインポート
 const { Pool } = require('pg'); // sqlと接続するためのパッケージpgのインポート
-const cors = require('cors') // 異なるドメインからのリクエストを許可するために使用
+const cors = require('cors'); // 異なるドメインからのリクエストを許可するために使用
 const bodyParser = require('body-parser'); // body-parserのインポート//HTTPリクエストのボディを解析するために使用
+const dayjs = require('dayjs'); // JavascriptのDate型がバグの原因になるので日付をきちんと扱うため
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
 
 const app = express(); // インスタンス化
 const PORT = 5000; // サーバーのポート番号
 app.use(cors()); // エラー消すためのまじない
+
+// todo: 機能ごとにファイル分けたり整理する
 
 //body-parserの設定
 app.use(bodyParser.json());
@@ -68,20 +72,58 @@ app.post('/api/login', async (req, res) => {
 
 //マイページエンドポイントの設定
 // 現在地と比較してあってたらtrue
+// からのDB更新
+// todo:きれいなコードにする
 app.post('/api/mypage', async (req, res) => {
-  const {longitude, latitude} = req.body;
+  const username = "unko"; // テスト用
+  const latitude = "36.54467010"; // 同上
+  const longitude = "136.70391990" // 同上
+  //const {longitude, latitude} = req.body;
   console.log(longitude, latitude);
   try {
+    // 現在地と一致するplace_idを検索
     const query = 'SELECT * FROM places WHERE longitude=$1 AND latitude=$2;';
     const values = [longitude, latitude];
     const result = await pool.query(query, values);
+    const place_id = result.rows[0].place_id;
+    console.log(place_id);
     if (result.rows.length > 0) {
       // stampsテーブルにstamp追加する
-      res.status(200).json({ match: true, places: result.rows });
+      // user_idの取得
+      const queryGetUserId = 'SELECT user_id FROM users WHERE username=$1';
+      const values2 = [username];
+      const result2 = await pool.query(queryGetUserId, values2);
+      const user_id = result2.rows[0].user_id;
+      console.log(user_id);
+      // stampの追加
+      // 同じ場所のスタンプを最近作ってたら追加しない フロントの位置情報更新に伴って無限に追加される場合があるので
+      const queryCheckTimeStamp = 'SELECT timestamp FROM stamps WHERE user_id=$1 AND place_id=$2'
+      const values3 = [user_id, place_id];
+      const result3 = await pool.query(queryCheckTimeStamp, values3);
+      //日付チェック
+      if (result3.rows.length > 0) {
+        console.log(result3);
+        const lastStampDate = dayjs(result3.rows[result3.rows.length-1].timestamp).utc(true);
+        const currentDate = dayjs.utc();
+        console.log(lastStampDate['$d'], currentDate['$d']);
+        // 過去のスタンプが最近１日以内なら追加しない
+        if (currentDate.diff(lastStampDate, 'day') < 1) {
+          console.log('stamp is too close')
+          res.status(200).json({ match: false });
+          return;
+        };
+      };
+      // スタンプなければ普通に追加
+      const queryAddStamp = 'INSERT INTO stamps (user_id, place_id) VALUES ($1, $2)';
+      const result4 = await pool.query(queryAddStamp, values3);
+      console.log(result4);
+      res.status(200).json({ match: true, places: result.rows[0] });
+      
+      
     } else {
       res.status(200).json({ match: false });
     }
-  } catch {
+  } catch (err) {
     console.error('Error executing query', err.stack);
     res.status(500).json({ message: 'Internal server error' });
   }
