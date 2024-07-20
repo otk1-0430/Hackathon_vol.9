@@ -14,10 +14,11 @@ function LogIn() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password}),
+      body: JSON.stringify({ username, password }),
     });
-
+    console.log(response.message)
     if(response.ok){
+        alert('ログインに成功しました！');
         navigate('/profile', { state: { username } });
     }else{
         alert('ログインに失敗しました');

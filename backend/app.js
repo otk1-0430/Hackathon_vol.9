@@ -47,25 +47,18 @@ app.post('/api/register', async (req, res) => {
 
 // ログインエンドポイントの設定
 // localhost:5000/login にアクセスしたときの動作
-app.get('/login', async (req, res) => {
-    res.send('ログイン画面');
+app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
-
+    console.log(username, password);
     try {
-      const query = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *';
+      const query =  'SELECT * FROM users WHERE username=$1 AND password=$2;';
       const values = [username, password];
       const result = await pool.query(query, values);
       if(result.rows.length > 0){
-        const user = result.rows[0];
-        const isMatch = await bcrypt.compare(password, user.password);
-        if(isMatch){
-          res.status(200).json({ message: 'ログイン成功！' });
-        } else {
-          res.status(401).json({ message: 'パスワードが間違っています．' });
-        }
+        res.status(200).json({ message: 'ログイン成功！' });
       } else {
-        res.status(401).json({ message: '無効な値です．' });
-      } 
+        res.status(401).json({ message: 'ユーザー名かパスワードが間違っています' });
+      }
     } catch (err) {
         console.error('Error executing query', err.stack);
         res.status(500).json({message: 'Internal server error'});
