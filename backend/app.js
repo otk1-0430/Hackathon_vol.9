@@ -75,30 +75,18 @@ app.post('/api/login', async (req, res) => {
 // 現在地と比較してあってたらtrue
 // からのDB更新
 // todo:きれいなコードにする
-const isTest = true;
 
 app.post('/api/mypage', async (req, res) => {
-  let username;
-  let latitude;
-  let longitude;
-  if (isTest) {
-    username = "unko"; // テスト用
-    latitude = "36.54467010"; // 同上
-    longitude = "136.70391990" // 同上
-  } else {
-    ({ username, latitude, longitude} = req.body);
-  }
-  
-  //const {longitude, latitude} = req.body;
-  console.log(longitude, latitude);
+  const { username, latitude, longitude} = req.body;
+  console.log(username, latitude, longitude);
   try {
     // 現在地と一致するplace_idを検索
     const query = 'SELECT * FROM places WHERE longitude=$1 AND latitude=$2;';
     const values = [longitude, latitude];
     const result = await pool.query(query, values);
-    const place_id = result.rows[0].place_id;
-    console.log(place_id);
     if (result.rows.length > 0) {
+      const place_id = result.rows[0].place_id;
+      console.log(place_id);
       // stampsテーブルにstamp追加する
       // user_idの取得
       const queryGetUserId = 'SELECT user_id FROM users WHERE username=$1';
@@ -132,6 +120,7 @@ app.post('/api/mypage', async (req, res) => {
       
       
     } else {
+      console.log('any place matched');
       res.status(200).json({ match: false });
     }
   } catch (err) {

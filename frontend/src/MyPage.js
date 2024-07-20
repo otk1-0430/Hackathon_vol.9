@@ -67,6 +67,7 @@ const MyPage = () => {
   const sendLocationData = async (lat, lng) => {
     try {
       await axios.post("http://localhost:5000/api/mypage", {
+        username: username,
         latitude: lat,
         longitude: lng,
       });
