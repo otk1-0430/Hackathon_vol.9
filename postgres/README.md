@@ -13,6 +13,15 @@ docker compose up -d
 ## 止め方
 ctrl + c
 
+## init.sqlの変更適用
+#### 以下、ルートディレクトリで実行してる
+```sh
+$ docker compose down # 実行中のコンテナ停止
+$ docker volume rm hackathon_vol9_postgres-data # コンテナのデータ削除
+$ docker image prune # キャッシュの削除
+$ docker compose up -d # 起動
+```
+
 ## ER図
 ![alt text](image.png)
 ### 解説
@@ -63,12 +72,16 @@ ctrl + c
     - ユーザーの訪問済みスポットを取得
     ```sql
     SELECT
-    s.place_id,
-    s.timestamp
-    FROM 
+        p.place_id,
+        p.placename,
+        p.latitude,
+        p.longitude
+    FROM
         stamps s
     JOIN 
         users u ON s.user_id = u.user_id
+    JOIN 
+        places p ON s.place_id = p.place_id
     WHERE 
         u.username = '指定したいユーザー名';
     ```
@@ -76,23 +89,7 @@ ctrl + c
 - 追加系
     - 新規訪問済みスポットを追加
     ```sql
-    -- 1. トランザクションの開始
-    BEGIN;
-    
-    -- 2. usernameからuser_idを取得
-    -- 'some_username'を実際のusernameに置き換えてください
-    WITH user_cte AS (
-        SELECT user_id
-        FROM users
-        WHERE username = 'some_username'
-    )
-    -- 3. user_idを使ってstampsテーブルにデータを挿入
-    INSERT INTO stamps (user_id, place_id)
-    SELECT user_id, 'some_place_id' -- 'some_place_id'を実際のplace_idに置き換えてください
-    FROM user_cte;
-    
-    -- 4. トランザクションのコミット
-    COMMIT;
+    INSERT INTO stamps (user_id, place_id) VALUES (user_id, place_id) -- VALUESの後に実際のuserid, placeidを入れる
     ```
 - 更新系
     - usernameの変更
