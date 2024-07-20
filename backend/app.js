@@ -47,6 +47,7 @@ app.post('/api/register', async (req, res) => {
 
 // ログインエンドポイントの設定
 // localhost:5000/login にアクセスしたときの動作
+// username, passwordをDBと照合し、レスポンス返す response.okにその結果が格納される
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     console.log(username, password);
@@ -66,6 +67,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 //マイページエンドポイントの設定
+// 現在地と比較してあってたらtrue
 app.post('/api/mypage', async (req, res) => {
   const {longitude, latitude} = req.body;
   console.log(longitude, latitude);
@@ -74,6 +76,7 @@ app.post('/api/mypage', async (req, res) => {
     const values = [longitude, latitude];
     const result = await pool.query(query, values);
     if (result.rows.length > 0) {
+      // stampsテーブルにstamp追加する
       res.status(200).json({ match: true, places: result.rows });
     } else {
       res.status(200).json({ match: false });
@@ -84,6 +87,17 @@ app.post('/api/mypage', async (req, res) => {
   }
 })
 
+//placesテーブルから全ての情報を取ってくる
+app.get('/api/mypage', async (req, res) => {
+  try{
+    const query = 'SELECT * FROM places'
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error executing query', err.stack);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+})
 
 
 // サーバーの起動
