@@ -4,6 +4,7 @@ import Leaflet from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import axios from "axios"; 
 import { mapOption, getCurrentPosition } from "./leafletCommon";
+import { useLocation } from 'react-router-dom';
 
 // 現在地アイコン
 const currentIcon = Leaflet.icon({
@@ -23,6 +24,10 @@ const placeIconPostVis = Leaflet.icon({
 });
 
 const MyPage = () => {
+  // routerでページ遷移したときついでにデータも渡す
+  const location = useLocation();
+  console.log(location);
+  const { username } = location.state;
   // キー設定
   const [mapKey, setMapKey] = useState(0);
   // 現在地情報
@@ -83,6 +88,9 @@ const MyPage = () => {
   return (
     <>
       {/* ボタン(機能操作) */}
+      <header>
+        <a>ようこそ、{username}さん</a>
+      </header>
       <div>
         <button onClick={() => moveCurrentPosition()}>現在地</button>
         <button onClick={() => fetchPlaceData()}>検索</button>
