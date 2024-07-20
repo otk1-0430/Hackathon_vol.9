@@ -26,7 +26,7 @@ function SignUp() {
     //レスポンスが200~299ならtrue
     if (response.ok) {
       //指定されたパス/profifeにナビゲート(遷移)する
-      navigate('/profile', { state: { username } });
+      navigate('/mypage', { state: { username } });
     } else {
       //メッセージを表示
       alert('登録に失敗しました');
