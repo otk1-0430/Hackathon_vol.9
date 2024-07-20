@@ -53,6 +53,7 @@ INSERT INTO users (username, password)
 -- スポットデータの挿入
 INSERT INTO places (placename, latitude, longitude)
     VALUES
+        ('金沢大学自然科学１号館', 36.5446701, 136.7039199),        
         ('north pole', 90.000000, 0.000000),
         ('south pole', -90.000000, 0.000000);
 
