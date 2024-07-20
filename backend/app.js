@@ -87,6 +87,17 @@ app.post('/api/mypage', async (req, res) => {
   }
 })
 
+//placesテーブルから全ての情報を取ってくる
+app.get('/api/mypage', async (req, res) => {
+  try{
+    const query = 'SELECT * FROM places'
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error executing query', err.stack);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+})
 
 
 // サーバーの起動
