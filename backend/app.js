@@ -5,6 +5,7 @@ const cors = require('cors'); // 異なるドメインからのリクエスト�
 const bodyParser = require('body-parser'); // body-parserのインポート//HTTPリクエストのボディを解析するために使用
 const dayjs = require('dayjs'); // JavascriptのDate型がバグの原因になるので日付をきちんと扱うため
 const utc = require('dayjs/plugin/utc');
+const e = require('express');
 dayjs.extend(utc);
 
 const app = express(); // インスタンス化
@@ -74,10 +75,20 @@ app.post('/api/login', async (req, res) => {
 // 現在地と比較してあってたらtrue
 // からのDB更新
 // todo:きれいなコードにする
+const isTest = true;
+
 app.post('/api/mypage', async (req, res) => {
-  const username = "unko"; // テスト用
-  const latitude = "36.54467010"; // 同上
-  const longitude = "136.70391990" // 同上
+  let username;
+  let latitude;
+  let longitude;
+  if (isTest) {
+    username = "unko"; // テスト用
+    latitude = "36.54467010"; // 同上
+    longitude = "136.70391990" // 同上
+  } else {
+    ({ username, latitude, longitude} = req.body);
+  }
+  
   //const {longitude, latitude} = req.body;
   console.log(longitude, latitude);
   try {
