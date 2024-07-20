@@ -75,18 +75,6 @@ const MyPage = () => {
     }
   };
 
-  // // 場所データを取得する関数
-  // const fetchPlaceData = async () => {
-  //   try {
-  //     const response = await axios.get("http://localhost:5000/api/mypage");
-  //     console.log('response', response.data);
-  //     setPlaceData(Array.from(response.data));
-  //     console.log('placedata', placeData);
-  //   } catch (error) {
-  //     console.error('Error fetching place data:', error);
-  //   }
-  // };
-
   // 場所データを取得する関数
   const fetchPlaceData = async () => {
     try {
@@ -129,9 +117,9 @@ const MyPage = () => {
         </Marker>
         {/* 場所情報を出力 */}
         {placeData.length > 0
-          ? placeData.map((item) => (
-              <Marker key={item.id} position={[item.latitude, item.longitude]} icon={placeIconPreVis}>
-                <Popup>{item.placename}</Popup>
+          ? placeData.map((place) => (
+              <Marker key={place.id} position={[place.latitude, place.longitude]} icon={placeIconPreVis}>
+                <Popup>{place.placename}</Popup>
               </Marker>
             ))
           : null}
