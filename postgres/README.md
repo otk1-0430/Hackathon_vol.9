@@ -76,7 +76,23 @@ ctrl + c
 - 追加系
     - 新規訪問済みスポットを追加
     ```sql
-    INSERT INTO stamps (user_id, place_id) VALUES (user_id, place_id) -- VALUESの後に実際のuserid, placeidを入れる
+    -- 1. トランザクションの開始
+    BEGIN;
+    
+    -- 2. usernameからuser_idを取得
+    -- 'some_username'を実際のusernameに置き換えてください
+    WITH user_cte AS (
+        SELECT user_id
+        FROM users
+        WHERE username = 'some_username'
+    )
+    -- 3. user_idを使ってstampsテーブルにデータを挿入
+    INSERT INTO stamps (user_id, place_id)
+    SELECT user_id, 'some_place_id' -- 'some_place_id'を実際のplace_idに置き換えてください
+    FROM user_cte;
+    
+    -- 4. トランザクションのコミット
+    COMMIT;
     ```
 - 更新系
     - usernameの変更
