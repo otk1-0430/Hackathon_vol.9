@@ -65,6 +65,27 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+//マイページエンドポイントの設定
+app.post('/api/mypage', async (req, res) => {
+  const {longitude, latitude} = req.body;
+  console.log(longitude, latitude);
+  try {
+    const query = 'SELECT * FROM places WHERE longitude=$1 AND latitude=$2;';
+    const values = [longitude, latitude];
+    const result = await pool.query(query, values);
+    if (result.rows.length > 0) {
+      res.status(200).json({ match: true, places: result.rows });
+    } else {
+      res.status(200).json({ match: false });
+    }
+  } catch {
+    console.error('Error executing query', err.stack);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+})
+
+
+
 // サーバーの起動
 app.listen(PORT, () => {
     console.log(`サーバー起動中🚀http://localhost:${PORT}`);
