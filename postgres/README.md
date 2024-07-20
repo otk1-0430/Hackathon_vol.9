@@ -55,24 +55,22 @@ ctrl + c
     - どちらか間違っていたら拒否
     - usersのレコードが帰ってきたら認証
 - 取得系
+    - 全ての訪問するべきスポットを取得
+        - place_id, place_name, 緯度経度
+    ```sql
+    SELECT * FROM places;
+    ```
     - ユーザーの訪問済みスポットを取得
     ```sql
     SELECT
-        u.user_id,
-        u.username,
-        p.place_id,
-        p.placename,
-        p.latitude,
-        p.longitude,
-        s.timestamp
-    FROM
+    s.place_id,
+    s.timestamp
+    FROM 
         stamps s
-    JOIN
+    JOIN 
         users u ON s.user_id = u.user_id
-    JOIN
-        places p ON s.place_id = p.place_id
-    WHERE
-        u.user_id = 1;  -- ここで特定のユーザーIDを指定
+    WHERE 
+        u.username = '指定したいユーザー名';
     ```
     - 近くのスポットを取得
 - 追加系
