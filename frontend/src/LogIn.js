@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, TextField, Container, Typography, Box, Grid, Link } from "@mui/material";
 
 function LogIn() {
   const [username, setUsername] = useState('');
@@ -26,28 +27,62 @@ function LogIn() {
   };
 
   return(
-    <div>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>ユーザーネーム</label>
-          <input
-            type="text"
-            onChange={(e) => setUsername(e.target.value)}
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Typography component="h1" variant="h5">
+          ログイン
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+          <TextField
+            variant="outlined"
+            margin="normal"
             required
+            fullWidth
+            id="username"
+            label="ユーザーネーム"
+            name="username"
+            autoComplete="username"
+            autoFocus
+            onChange={(e) => setUsername(e.target.value)}
           />
-        </div>
-        <div>
-          <label>パスワード</label>
-            <input
-              type="password"
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-        </div>
-      <button type="submit">ログイン</button>
-      </form>
-      <button onClick={() => navigate('/signup')}>新規登録の方はこちら</button>
-    </div>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="パスワード"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            ログイン
+          </Button>
+          <Grid container>
+            <Grid item>
+              <Link href="#" variant="body2" onClick={() => navigate('/signup')}>
+                新規登録の方はこちら
+              </Link>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+    </Container>
   );
 }
 
