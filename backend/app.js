@@ -158,7 +158,7 @@ app.get('/api/mypage/postvis', async (req, res) => {
           users u ON s.user_id = u.user_id
       JOIN 
           places p ON s.place_id = p.place_id
-      WHERE 
+      WHERE
           u.username = $1;
       `
     const result = await pool.query(query, [username]);
