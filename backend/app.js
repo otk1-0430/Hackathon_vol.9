@@ -142,7 +142,7 @@ app.get('/api/mypage', async (req, res) => {
 })
 
 //訪問済みの場所の情報を取ってくる
-app.get('/api/mypage', async (req, res) => {
+app.get('/api/mypage/postvis', async (req, res) => {
   try{
     const query = `
       SELECT
