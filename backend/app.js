@@ -141,6 +141,31 @@ app.get('/api/mypage', async (req, res) => {
   }
 })
 
+//訪問済みの場所の情報を取ってくる
+app.get('/api/mypage', async (req, res) => {
+  try{
+    const query = `
+      SELECT
+        p.place_id,
+        p.placename,
+        p.latitude,
+        p.longitude
+      FROM
+          stamps s
+      JOIN 
+          users u ON s.user_id = u.user_id
+      JOIN 
+          places p ON s.place_id = p.place_id
+      WHERE 
+          u.username = '指定したいユーザー名';
+      `
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error executing query', err.stack);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+})
 
 // サーバーの起動
 app.listen(PORT, () => {
