@@ -144,6 +144,8 @@ app.get('/api/mypage', async (req, res) => {
 //訪問済みの場所の情報を取ってくる
 app.get('/api/mypage/postvis', async (req, res) => {
   try{
+    const { username } = req.query;
+    console.log(username);
     const query = `
       SELECT
         p.place_id,
@@ -156,10 +158,10 @@ app.get('/api/mypage/postvis', async (req, res) => {
           users u ON s.user_id = u.user_id
       JOIN 
           places p ON s.place_id = p.place_id
-      WHERE 
-          u.username = '指定したいユーザー名';
+      WHERE
+          u.username = $1;
       `
-    const result = await pool.query(query);
+    const result = await pool.query(query, [username]);
     res.status(200).json(result.rows);
   } catch (err) {
     console.error('Error executing query', err.stack);

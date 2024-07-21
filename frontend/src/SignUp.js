@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, TextField, Container, Typography, Box, Grid, Link } from "@mui/material";
+
 
 function SignUp() {
   const [username, setUsername] = useState('');
@@ -34,31 +36,62 @@ function SignUp() {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>ユーザーネーム</label>
-          <input
-            type="text"
-            //入力内容をusernameのステートにセット
+  <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Typography component="h1" variant="h5">
+          会員登録
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="ユーザーネーム"
+            name="username"
+            autoComplete="username"
+            autoFocus
             onChange={(e) => setUsername(e.target.value)}
-            required
           />
-        </div>
-        <div>
-          <label>パスワード</label>
-          <input
-            //入力内容を隠す
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="パスワード"
             type="password"
-            //入力内容をpasswordのステートにセット
+            id="password"
+            autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
-            required
           />
-        </div>
-        <button type="submit">会員登録</button>
-      </form>
-      <button onClick={() => navigate('/')}>ログイン画面に戻る</button>
-    </div>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            会員登録
+          </Button>
+          <Grid container>
+            <Grid item>
+              <Link href="#" variant="body2" onClick={() => navigate('/')}>
+                ログイン画面に戻る
+              </Link>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+    </Container>
   );
 }
 

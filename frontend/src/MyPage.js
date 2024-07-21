@@ -5,6 +5,8 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import axios from "axios"; 
 import { mapOption, getCurrentPosition } from "./leafletCommon";
 import { useLocation } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Container, Box } from "@mui/material";
+
 
 // 現在地アイコン
 const currentIcon = Leaflet.icon({
@@ -38,10 +40,13 @@ const MyPage = () => {
   // 場所情報
   const [placeData, setPlaceData] = useState([]);
 
+  const [postVisData, setPostVisData] = useState([]);
+  const [preVisData, setPreVisData] = useState([]);
+
   // 初期処理
   useEffect(() => {
     moveCurrentPosition();
-    fetchPlaceData(); 
+    getDevidePlaceData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -87,45 +92,81 @@ const MyPage = () => {
       console.error('Error fetching place data:', error);
     }
   };
+  // 訪問済みを取得
+  const fetchPostVisData = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/mypage/postvis", { params: {
+        username: username
+      }
+    });
+      setPostVisData(response.data);
+      console.log(postVisData);
+    } catch (error) {
+      console.error('Error fetching place data:', error);
+    }
+  };
 
+  // 全場所+訪問済みを取得して訪問済みと未訪問に分ける
+  const getDevidePlaceData = async () => {
+    await fetchPlaceData();
+    await fetchPostVisData();
+    const newPre = placeData.filter((place) => {
+      if (postVisData.some((postplace) => postplace.id===place.id)) {
+        return place
+      }
+    });
+    setPreVisData(newPre);
+  };
+
+    console.log(preVisData, postVisData);
   return (
-    <>
-      {/* ボタン(機能操作) */}
-      <header>
-        <a>ようこそ、{username}さん</a>
-      </header>
-      <div>
-        <button onClick={() => moveCurrentPosition()}>現在地</button>
-        <button onClick={() => fetchPlaceData()}>検索</button>
-      </div>
-      {/* 地図表示 */}
-      <MapContainer
-        key={mapKey}
-        center={currentPosition}
-        zoom={mapOption.startZoom}
-        style={{ height: "90vh", width: "100vw" }}
-      >
-        {/* 地図のタイル情報 */}
-        <TileLayer
-          attribution='&amp;copy <a href="http://osm.org/copyright";>OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maxZoom={mapOption.maxZoom}
-          minZoom={mapOption.minZoom}
-        />
-        {/* 現在地情報を出力 */}
-        <Marker position={currentPosition} icon={currentIcon}>
-          <Popup>現在地</Popup>
-        </Marker>
-        {/* 場所情報を出力 */}
-        {placeData.length > 0
-          ? placeData.map((place) => (
+    <Container>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            {username}さんの世界征服マップ
+          </Typography>
+          <Button color="inherit" onClick={() => moveCurrentPosition()}>
+            現在地
+          </Button>
+          <Button color="inherit" onClick={() => getDevidePlaceData()}>
+            検索
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Box sx={{ height: "90vh", width: "100%", mt: 2 }}>
+        <MapContainer
+          key={mapKey}
+          center={currentPosition}
+          zoom={mapOption.startZoom}
+          style={{ height: "100%", width: "100%" }}
+        >
+          <TileLayer
+            attribution='&amp;copy <a href="http://osm.org/copyright";>OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            maxZoom={mapOption.maxZoom}
+            minZoom={mapOption.minZoom}
+          />
+          <Marker position={currentPosition} icon={currentIcon}>
+            <Popup>現在地</Popup>
+          </Marker>
+          {preVisData.length > 0 &&
+            preVisData.map((place) => (
               <Marker key={place.id} position={[place.latitude, place.longitude]} icon={placeIconPreVis}>
                 <Popup>{place.placename}</Popup>
               </Marker>
             ))
-          : null}
-      </MapContainer>
-    </>
+          }
+          {postVisData.length > 0 &&
+            postVisData.map((place) => (
+              <Marker key={place.id} position={[place.latitude, place.longitude]} icon={placeIconPostVis}>
+                <Popup>{place.placename}</Popup>
+              </Marker>
+            ))
+          }
+        </MapContainer>
+      </Box>
+    </Container>
   );
 };
 
