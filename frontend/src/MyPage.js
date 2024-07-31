@@ -28,7 +28,7 @@ const placeIconPostVis = Leaflet.icon({
 const MyPage = () => {
   // routerでページ遷移したときついでにデータも渡す
   const location = useLocation();
-  console.log(location);
+  //console.log(location);
   const { username } = location.state;
   // キー設定
   const [mapKey, setMapKey] = useState(0);
@@ -39,7 +39,6 @@ const MyPage = () => {
   });
   // 場所情報
   const [placeData, setPlaceData] = useState([]);
-
   const [postVisData, setPostVisData] = useState([]);
   const [preVisData, setPreVisData] = useState([]);
 
@@ -47,7 +46,6 @@ const MyPage = () => {
   useEffect(() => {
     moveCurrentPosition();
     getDevidePlaceData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 現在地に移動
@@ -59,7 +57,7 @@ const MyPage = () => {
         lng: location.coords.longitude,
       });
       // 現在地のデータをバックエンドに送信
-      console.log(location.coords.latitude, location.coords.longitude);
+      //console.log(location.coords.latitude, location.coords.longitude);
       await sendLocationData(location.coords.latitude, location.coords.longitude);
       // キーを設定して、再表示
       setMapKey(new Date().getTime());
@@ -82,9 +80,10 @@ const MyPage = () => {
   };
 
   // 場所データを取得する関数
+  //未訪問の場所だけを取ってくるようにした（訪問済みは取ってこない）
   const fetchPlaceData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/mypage");
+      const response = await axios.get("http://localhost:5000/api/mypage", {params: {username: username}});
       console.log('response', response.data);
       setPlaceData(Array.from(response.data));
       console.log('placedata', Array.from(response.data)); // setPlaceData後のplaceDataは非同期で更新されるため、直接データをログに出力
@@ -97,10 +96,9 @@ const MyPage = () => {
     try {
       const response = await axios.get("http://localhost:5000/api/mypage/postvis", { params: {
         username: username
-      }
-    });
+      }});
       setPostVisData(response.data);
-      console.log(postVisData);
+      //console.log(postVisData);
     } catch (error) {
       console.error('Error fetching place data:', error);
     }
@@ -117,6 +115,17 @@ const MyPage = () => {
     });
     setPreVisData(newPre);
   };
+
+  
+
+
+
+
+
+  
+  useEffect(() => {
+    getDevidePlaceData();
+  }, []);
 
     console.log(preVisData, postVisData);
   return (

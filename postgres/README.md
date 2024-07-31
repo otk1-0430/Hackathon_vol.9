@@ -56,6 +56,13 @@ $ docker compose up -d # 起動
 | 3 | 1 | 2 |
 
 ## 各種データ操作のsql文
+- PostgreSQLデータベースに接続する
+    ```bash
+    psql DB user
+    ```
+    - psql:　コマンドラインツール
+    - DB:　DB名
+    - user:　ユーザー名
 - ユーザー認証
     ```sql
     SELECT * FROM users WHERE username='username' AND password='password';
