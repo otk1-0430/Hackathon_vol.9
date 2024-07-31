@@ -38,14 +38,14 @@ const MyPage = () => {
     lng: 0,
   });
   // 場所情報
-  const [placeData, setPlaceData] = useState([]);
-  const [postVisData, setPostVisData] = useState([]);
-  const [preVisData, setPreVisData] = useState([]);
+  const [placeData, setPlaceData] = useState([]); // いらなくなった
+  const [postVisData, setPostVisData] = useState([]); // 訪問後
+  const [preVisData, setPreVisData] = useState([]); // 訪問前
 
   // 初期処理
   useEffect(() => {
     moveCurrentPosition();
-    getDevidePlaceData();
+    // getDevidePlaceData();
   }, []);
 
   // 現在地に移動
@@ -81,11 +81,11 @@ const MyPage = () => {
 
   // 場所データを取得する関数
   //未訪問の場所だけを取ってくるようにした（訪問済みは取ってこない）
-  const fetchPlaceData = async () => {
+  const fetchPreVisData = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/mypage", {params: {username: username}});
       console.log('response', response.data);
-      setPlaceData(Array.from(response.data));
+      setPreVisData(Array.from(response.data));
       console.log('placedata', Array.from(response.data)); // setPlaceData後のplaceDataは非同期で更新されるため、直接データをログに出力
     } catch (error) {
       console.error('Error fetching place data:', error);
@@ -94,29 +94,32 @@ const MyPage = () => {
   // 訪問済みを取得
   const fetchPostVisData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/mypage/postvis", { params: {
-        username: username
-      }});
+      const response = await axios.get("http://localhost:5000/api/mypage/postvis", { params: {username: username}});
       setPostVisData(response.data);
       //console.log(postVisData);
     } catch (error) {
       console.error('Error fetching place data:', error);
     }
   };
-
-  // 全場所+訪問済みを取得して訪問済みと未訪問に分ける
-  const getDevidePlaceData = async () => {
-    await fetchPlaceData();
+  
+  // 訪問済みと訪問前のデータとってくる
+  const getPlaceData = async () => {
+    await fetchPreVisData();
     await fetchPostVisData();
-    const newPre = placeData.filter((place) => {
-      if (postVisData.some((postplace) => postplace.id===place.id)) {
-        return place
-      }
-    });
-    setPreVisData(newPre);
+    // const newPre = placeData.filter((place) => {
+    //   if (postVisData.some((postplace) => postplace.id===place.id)) {
+    //     return place
+    //   }
+    // });
+    // setPreVisData(newPre);
   };
 
-  
+  // 検索ボタンのハンドラ
+  const handleSearchPlaces = () => {
+    // 検索画面に遷移させる、またはモーダル出す
+    // 検索ボタンの横に入力フォーム必要
+    getPlaceData(); // いったん前の仕様を引き継ぐ
+  };
 
 
 
@@ -124,7 +127,7 @@ const MyPage = () => {
 
   
   useEffect(() => {
-    getDevidePlaceData();
+    getPlaceData();
   }, []);
 
     console.log(preVisData, postVisData);
@@ -138,7 +141,7 @@ const MyPage = () => {
           <Button color="inherit" onClick={() => moveCurrentPosition()}>
             現在地
           </Button>
-          <Button color="inherit" onClick={() => getDevidePlaceData()}>
+          <Button color="inherit" onClick={() => handleSearchPlaces()}>
             検索
           </Button>
         </Toolbar>
