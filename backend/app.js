@@ -36,7 +36,7 @@ const pool = new Pool({
 // ユーザー登録エンドポイント
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
-  console.log(username, password); // 検証用
+  //console.log(username, password); // 検証用
 
   try {
     const query = 'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *';
@@ -55,7 +55,7 @@ app.post('/api/register', async (req, res) => {
 // username, passwordをDBと照合し、レスポンス返す response.okにその結果が格納される
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
-    console.log(username, password);
+    //console.log(username, password);
     try {
       const query =  'SELECT * FROM users WHERE username=$1 AND password=$2;';
       const values = [username, password];
@@ -78,7 +78,7 @@ app.post('/api/login', async (req, res) => {
 
 app.post('/api/mypage', async (req, res) => {
   const { username, latitude, longitude} = req.body;
-  console.log(username, latitude, longitude);
+  //console.log(username, latitude, longitude);
   try {
     // 現在地と一致するplace_idを検索
     const query = 'SELECT * FROM places WHERE longitude=$1 AND latitude=$2;';
@@ -86,14 +86,14 @@ app.post('/api/mypage', async (req, res) => {
     const result = await pool.query(query, values);
     if (result.rows.length > 0) {
       const place_id = result.rows[0].place_id;
-      console.log(place_id);
+      //console.log(place_id);
       // stampsテーブルにstamp追加する
       // user_idの取得
       const queryGetUserId = 'SELECT user_id FROM users WHERE username=$1';
       const values2 = [username];
       const result2 = await pool.query(queryGetUserId, values2);
       const user_id = result2.rows[0].user_id;
-      console.log(user_id);
+      //console.log(user_id);
       // stampの追加
       // 同じ場所のスタンプを最近作ってたら追加しない フロントの位置情報更新に伴って無限に追加される場合があるので
       const queryCheckTimeStamp = 'SELECT timestamp FROM stamps WHERE user_id=$1 AND place_id=$2'
@@ -101,10 +101,10 @@ app.post('/api/mypage', async (req, res) => {
       const result3 = await pool.query(queryCheckTimeStamp, values3);
       //日付チェック
       if (result3.rows.length > 0) {
-        console.log(result3);
+        //console.log(result3);
         const lastStampDate = dayjs(result3.rows[result3.rows.length-1].timestamp).utc(true);
         const currentDate = dayjs.utc();
-        console.log(lastStampDate['$d'], currentDate['$d']);
+        //console.log(lastStampDate['$d'], currentDate['$d']);
         // 過去のスタンプが最近１日以内なら追加しない
         if (currentDate.diff(lastStampDate, 'day') < 1) {
           console.log('stamp is too close')
@@ -115,7 +115,7 @@ app.post('/api/mypage', async (req, res) => {
       // スタンプなければ普通に追加
       const queryAddStamp = 'INSERT INTO stamps (user_id, place_id) VALUES ($1, $2)';
       const result4 = await pool.query(queryAddStamp, values3);
-      console.log(result4);
+      //console.log(result4);
       res.status(200).json({ match: true, places: result.rows[0] });
       
       
@@ -130,10 +130,28 @@ app.post('/api/mypage', async (req, res) => {
 })
 
 //placesテーブルから全ての情報を取ってくる
+//このときに未訪問の場所だけを取ってくるようにしたい
 app.get('/api/mypage', async (req, res) => {
   try{
-    const query = 'SELECT * FROM places'
-    const result = await pool.query(query);
+    const { username } = req.query;
+
+    // まず、usernameからuser_idを取得するクエリ
+    const userResult = await pool.query('SELECT user_id FROM users WHERE username = $1', [username]);
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userId = userResult.rows[0].user_id;
+
+    // 次に、user_idを使って未訪問の場所を取得するクエリ
+    const query = `
+      SELECT p.place_id, p.placename, p.latitude, p.longitude
+      FROM places p
+      LEFT JOIN stamps s ON p.place_id = s.place_id AND s.user_id = $1
+      WHERE s.place_id IS NULL;
+    `
+    const result = await pool.query(query, [userId]);
+
     res.status(200).json(result.rows);
   } catch (err) {
     console.error('Error executing query', err.stack);
@@ -145,7 +163,7 @@ app.get('/api/mypage', async (req, res) => {
 app.get('/api/mypage/postvis', async (req, res) => {
   try{
     const { username } = req.query;
-    console.log(username);
+    //console.log(username);
     const query = `
       SELECT
         p.place_id,
